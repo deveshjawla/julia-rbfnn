@@ -3,7 +3,7 @@ julia-rbfnn
 
 Julia package for Radial Basis Function Neural Networks (RBFNN)
 
-This is translation of Chris McCormick Octave/Matlab code from https://dl.dropboxusercontent.com/u/94180423/RBFN_Example_v2014_04_08.zip 
+This is translation of Chris McCormick RBFNN (http://chrisjmccormick.wordpress.com/2013/08/16/rbf-network-matlab-code/) Octave/Matlab code https://dl.dropboxusercontent.com/u/94180423/RBFN_Example_v2014_04_08.zip  
 Julia version for now is not optimized, but runs 60% faster.
 
 For allocation of RBF neurons kMeans package is used, for allocation of beta parameters (neuron widths) computeRBFBetas.jl routine is used.
