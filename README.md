@@ -12,4 +12,4 @@ Amount of output neurons is determined based on count of categories/labels (they
 
 Please refer to test.jl file to see how stuff works. It uses Plot.ly to do graphing - so make sure you provide your credentials for logging into plot'ly (see the very end of file).
 
-Two main functions are trainRbf and evaluateRBFN - they build model and utilize it respectively. 
+Two main functions are trainRbf and evaluateRbf - they build model and utilize it respectively. 
