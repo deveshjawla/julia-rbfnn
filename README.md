@@ -10,6 +10,6 @@ For allocation of RBF neurons kMeans package is used, for allocation of beta par
 Once al RBF neurons are found, their parameters remain fixed and Gradient Descent is used to find weights between RBF neurons and output neurons.
 Amount of output neurons is determined based on count of categories/labels (they should be represented in separate integer vector). Labels should start from 1 and monotonically increase. 
 
-Please refer to test.jl file to see how stuff works.
+Please refer to test.jl file to see how stuff works. It uses Plot.ly to do graphing - so make sure you provide your credentials for logging into plot'ly (see the very end of file).
 
 Two main functions are trainRbf and evaluateRBFN - they build model and utilize it respectively. 
