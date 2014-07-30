@@ -5,11 +5,10 @@ include("computeRBFBetas.jl")
 include("rbfActivations.jl")
 include("costFunctionRBFN.jl")
 include("trainRbf.jl")
-include("evaluateRBFN.jl")
+include("evaluateRbf.jl")
 include("fmincg.jl")
 
 data = readcsv("dataset.csv")
-#data = [ 0. 0. 1.; 0.1 0.1 1.; 1. 1. 1.; 0.9 0.9 1; 0. 1. 2.; 0.1 1.0 2.; 1. 0. 2.; 1.0 0.1 2.0]
 numdims = size(data,2) - 1
 X = data[:, 1 : numdims]
 y = data[:, numdims + 1]
@@ -21,96 +20,54 @@ show(size(X))
 show(size(y))
 @printf("\n")
 
-#count = 100
-#t = zeros(count, 1)
-#for i = 1:count
-#    tic();
-    (Centers, betas, Theta) = trainRbf(X, y, 5, true)
-#    t[i] = toc();
-#end
-#@printf("\n Timings: \n")
-#show(t)
-#@printf("\n")
-
-#@printf("\n Centers2 \n")
-#show(Centers2)
-#@printf("\n betas2 \n")
-#show(betas2)
-#@printf("\n Theta2 \n")
-#show(Theta2)
-#@printf("\n")
-
-#train2(X, y, 2, true)
-#    Centers = [    -0.4528   -0.7259;
-#		    1.1624   -0.2929;
-#		    0.8586   -1.3844;
-#		   -0.8102    0.3913;
-#		    0.4574    0.3437;
-#		   -0.2140    1.2991;
-#		   -1.4650    0.7938;
-#		   -1.3791   -0.8765;
-#		    1.0840    1.0717;
-#		    0.8385   -1.1455]
-#   betas =
-#   [2.2308;
-#    3.7955;
-#    3.0337;
-#    3.3659;
-#    3.3811;
-#    2.3574;
-#    2.7513;
-#    2.3913;
-#    2.4260;
-#    0.8062]'
-#    betas = betas'
-
-#    Theta = [
-#    0.2348    0.7652;
-#    1.0598   -1.0598;
-#    1.2324   -1.2324;
-#    1.3993   -1.3993;
-#    1.0509   -1.0509;
-#    1.0140   -1.0140;
-#   -0.2464    0.2464;
-#   -0.3964    0.3964;
-#   -0.4506    0.4506;
-#   -0.2580    0.2580;
-#   -0.6041    0.6041]
-
-@printf("\n Centers \n")
-show(Centers)
-@printf("\n betas \n")
-show(betas)
-@printf("\n Theta \n")
-show(Theta)
-@printf("\n")
-
-########################################
-# Let's test
-
-# Define a grid over which to evaluate the RBFN.
 gridSize = 100
 u = linspace(-2.0, 2.0, gridSize)
 v = linspace(-2.0, 2.0, gridSize)
 
-# We'll store the scores for each category as well as the 'prediction' for
-# each point on the grid.
-scores1 = zeros(length(u), length(v))
-scores2 = zeros(length(u), length(v))
-p = zeros(length(u), length(v))
+#count = 100
+#t = zeros(count, 1)
+#for timingIndex = 1:count
+#	tic();
+	(Centers, betas, Theta) = trainRbf(X, y, 5, false)
+#	t[timingIndex] = toc();
+#end
 
-# Evaluate the RBFN over the grid.
-z = rand(gridSize, gridSize)
-for i = 1:gridSize, j = 1:gridSize
-    scores = evaluateRBFN(Centers, betas, Theta, hcat(u[i], v[j]))
-    z[i,j] = scores[1,1]
-end
+#@printf("\n Timings: \n")
+#show(t)
+#@printf("\n")
+	########################################
+	# Let's test
 
-data = [["z" => z, "x" => u, "y" => v, "type" => "contour"]]
-Plotly.signin("secret", "secret")
-response = Plotly.plot([data], ["filename" => "simple-contour", "fileopt" => "overwrite"])
-plot_url = response["url"]
-@printf("\n ========================= \n")
-@printf("\n URL \n")
-show(plot_url)
-@printf("\n")
+	# Define a grid over which to evaluate the RBFN.
+
+	# We'll store the scores for each category as well as the 'prediction' for
+	# each point on the grid.
+	scores1 = zeros(length(u), length(v))
+	scores2 = zeros(length(u), length(v))
+	p = zeros(length(u), length(v))
+
+	# Evaluate the RBFNN over the grid.
+	z = rand(gridSize, gridSize)
+	for i = 1:gridSize, j = 1:gridSize
+	    scores = evaluateRbf(Centers, betas, Theta, hcat(u[i], v[j]))
+	    z[i,j] = scores[1,1]
+	end
+	#t[timingIndex] = toc();
+#end
+
+#@printf("\n Timings: \n")
+#show(t)
+#@printf("\n")
+
+
+########################################
+# Draw contour
+
+#data = [["z" => z, "x" => u, "y" => v, "type" => "contour"]]
+#Plotly.signin("secret", "secret")
+#response = Plotly.plot([data], ["filename" => "simple-contour", "fileopt" => "overwrite"])
+#plot_url = response["url"]
+#@printf("\n ========================= \n")
+#@printf("\n URL \n")
+#show(plot_url)
+#@printf("\n")

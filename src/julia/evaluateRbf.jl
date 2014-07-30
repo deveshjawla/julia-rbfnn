@@ -1,4 +1,4 @@
-function evaluateRBFN(Centers::Array{Float64,2}, betas::Array{Float64,2}, Theta::Array{Float64,2}, input::Array{Float64,2})
+function evaluateRbf(Centers::Array{Float64,2}, betas::Array{Float64,2}, Theta::Array{Float64,2}, input::Array{Float64,2})
 # EVALUATERBFN Computes the outputs of an RBF Network for the provided input.
 #   z = evaluateRBFN(centers, betas, weights, input) Evaluates the RBFN over
 #   given input using the provided parameters.
@@ -22,9 +22,9 @@ function evaluateRBFN(Centers::Array{Float64,2}, betas::Array{Float64,2}, Theta:
     
     # Compute the activations for each RBF neuron for this input.
     phis = getRBFActivations(Centers, betas, input);
-    @printf("\n phis \n")
-    show(phis)
-    @printf("\n")
+    #@printf("\n phis \n")
+    #show(phis)
+    #@printf("\n")
 	
     # Add a 1 to the beginning of the activations vector for the bias term.
     #phis = [1; phis];
