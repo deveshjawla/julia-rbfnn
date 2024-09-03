@@ -17,7 +17,7 @@ function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, n
     if (verbose)
         println("3. Learn output weights.\n")
     end
-    nn = Dense(numRBFNeurons, numCats)
+    nn = Dense(numRBFNeurons, numCats; bias=false)
 
     y = Flux.onehotbatch(vec(y), 1:numCats)
 
@@ -61,7 +61,7 @@ function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, n
 
     end
     scatter(trnlosses, width=80, height=30)
-    savefig("./loss_cruve_$(rand()).pdf")
+    savefig("./loss_cruve.pdf")
 
     return optim_theta, re
 end

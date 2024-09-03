@@ -93,18 +93,6 @@ function computeCentroids(X_train::Array{Float32,2}, y_train::Array{Int64,1}, ce
         betas_c = computeRBFBetas(Xc, Centroids_c, memberships_c)
 
         # Add the centroids and their beta values to the network.
-
-        #@printf("\n betas \n")
-        #show(betas)
-        #@printf("\n betas_c \n")
-        #show(betas_c)
-        #@printf("\n")        
-        #@printf("\n Centers \n")
-        #show(Centers)
-        #@printf("\n Centroids_c \n")
-        #show(Centroids_c)
-        #@printf("\n")        
-        #Centers = [Centers; Centroids_c]
         Centers = vcat(Centers, Centroids_c)
         betas = vcat(betas, betas_c)
     end

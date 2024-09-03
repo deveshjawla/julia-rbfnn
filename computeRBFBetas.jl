@@ -45,10 +45,5 @@ function computeRBFBetas(X::Array{Float32,2}, centroids::Array{Float32,2}, membe
     # Compute the beta values from the sigmas.
     betas = 1 ./ (2 .* sigmas .^ 2)
 
-    #@printf("\n FINAL betas for category cluster centers \n")	  
-    #show(typeof(betas));
-    #show(betas)	
-    #@printf("\n ")
-
     return betas
 end
