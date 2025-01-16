@@ -86,3 +86,14 @@ function computeWeights(X::Array{Float32,2}, y::Vector{Int64}, sample_weights, n
 
     return optim_theta, re
 end
+
+function logitcrossentropyweighted(ŷ::AbstractArray, y::AbstractArray, sample_weights::AbstractArray; dims=1)
+    if size(ŷ) != size(y)
+        error("logitcrossentropyweighted(ŷ, y), sizes of (ŷ, y) are not the same")
+    end
+    if size(y, 2) != size(sample_weights, 1)
+        error("logitcrossentropyweighted(ŷ, y), size y = $(size(y)) and size of sample_weights = $(size(sample_weights)) not the same")
+    end
+
+    mean(permutedims(sample_weights) .* -sum((y .* logsoftmax(ŷ; dims=dims)); dims=dims))
+end

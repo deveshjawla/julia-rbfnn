@@ -43,7 +43,7 @@ function computeCentroids(X_train::Array{Float32,2}, y_train::Array{Int64,1}, ce
     for c ∈ 1:numCats
 
         if (verbose)
-            @printf("  Category %d centers...\n", c)
+            println("  Category $(c) centers...\n")
         end
 
         # Select the training vectors for category 'c'.
@@ -67,7 +67,7 @@ function computeCentroids(X_train::Array{Float32,2}, y_train::Array{Int64,1}, ce
 
         # Run k-means clustering, with at most 100 iterations.        
         if centersforC != 0
-            @printf("  Running kmeans with %d centers...\n", centersforC)
+            println("  Running kmeans with $(centersforC) centers...\n")
             result = kmeans(permutedims(Xc), centersforC)
             Centroids_c = permutedims(result.centers)
             memberships_c = result.assignments
@@ -96,7 +96,7 @@ function computeCentroids(X_train::Array{Float32,2}, y_train::Array{Int64,1}, ce
             #    Compute Beta Coefficients
             # ================================
             if (verbose)
-                @printf("  Category %d betas...\n", c)
+                println("  Category $(c) betas...\n")
             end
 
             # Compute betas for all the clusters.
