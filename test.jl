@@ -1,5 +1,5 @@
 using Clustering
-using Plots
+using StatsPlots
 using CSV, DataFrames, Printf
 using Statistics
 using Flux, ParameterSchedulers
@@ -10,44 +10,21 @@ include("computeRBFBetas.jl")
 include("computeCentroids.jl")
 include("computeRBFActivations.jl")
 include("computeWeights.jl")
-include("trainRbf.jl")
-
-function gendata(n)
-	x1 = randn(Float32, 2, n)
-	x2 = randn(Float32, 2, n) .+ [2, 2]
-	x3 = randn(Float32, 2, n) .+ [-2, 2]
-	y1 = vcat(ones(Float32, n), zeros(Float32, 2 * n))
-	y2 = vcat(zeros(Float32, n), ones(Float32, n), zeros(Float32, n))
-	y3 = vcat(zeros(Float32, n), zeros(Float32, n), ones(Float32, n))
-	hcat(x1, x2, x3), permutedims(hcat(y1, y2, y3))
-end
+include("trainRBF.jl")
+include("testRBF.jl")
+include("./../DataUtils.jl")
 
 # Generate data
 n = 200
-X, y = gendata(n)
-X= permutedims(X)
+X, y = gen_3_clusters(n)
+X = permutedims(X)
 y = Flux.onecold(y)
-
-# data = CSV.read("dataset.csv", DataFrame, header=false)
-# numdims = size(data, 2) - 1
-# X = Matrix{Float32}(data[:, 1:numdims])
-# y = data[:, numdims+1]
 
 gridSize = 100
 u = range(-10.0f0, 10.0f0, length=gridSize)
 v = range(-10.0f0, 10.0f0, length=gridSize)
 
-#count = 100
-#t = zeros(count, 1)
-#for timingIndex = 1:count
-#	tic();
-(Centers, betas, Theta, nn) = trainRbf(X, y, 10, false)
-#	t[timingIndex] = toc();
-#end
-
-########################################
-# Let's test
-model = nn(Theta)
+(Centers, betas, Theta, nn) = trainRbf(X, y, 10, true, 3)
 
 # # ================================================
 # #       Evaluate the RBFNN over the grid.
@@ -55,18 +32,9 @@ model = nn(Theta)
 # # Define a grid over which to evaluate the RBFN.
 # # We'll store the scores for each category as well as the 'prediction' for
 # # each point on the grid.
-# scores1 = zeros(lastindex(u), lastindex(v))
-# scores2 = zeros(lastindex(u), lastindex(v))
-# p = zeros(lastindex(u), lastindex(v))
-# z = rand(gridSize, gridSize)
-# for i = 1:gridSize, j = 1:gridSize
-#     scores =  softmax(model(getRBFActivations(Centers, betas, hcat(u[i], v[j]))))
-#     z[i, j] = scores[1, 1]
-# end
-
 ########################################
 # Draw contour
-heatmap(u, v, (x, y) -> softmax(model(getRBFActivations(Centers, betas, hcat(x, y))))[3])
+heatmap(u, v, (x, y) -> testRbf(Centers, betas, Theta, nn, hcat(x, y))[3])
 scatter!(Centers[:, 1], Centers[:, 2], color=:blue, label="Centers")
 scatter!(X[y.==1, 1], X[y.==1, 2], color=:red, label="1")
 scatter!(X[y.==2, 1], X[y.==2, 2], color=:green, label="2")

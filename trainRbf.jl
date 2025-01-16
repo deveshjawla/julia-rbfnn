@@ -24,34 +24,34 @@ betas    - The beta coefficient for each coressponding RBF neuron.
 Theta    - The weights for the output layer. There is one row per neuron
 and one column per output node / category.
 """
-function trainRbf(X_train::Array{Float32,2}, y_train::Array{Int64,1}, centersPerCategory::Int64, verbose::Bool)
-    # Get the number of unique categories in the dataset.
-    numCats = size(unique(y_train), 1)
+function trainRbf(X_train::Array{Float64, 2}, y_train::Vector{Int64}, sample_weights, centersPerCategory::Int64, verbose::Bool, numCats::Int)
+	# Get the number of unique categories in the dataset.
+	# numCats = size(unique(y_train), 1)
 
-    # Ensure category values are non-zero and continuous.
-    # This allows the index of the output node to equal its category (e.g.,
-    # the first output node is category 1).
-    if (any(y_train .== 0) || any(y_train .> numCats))
-        error("Category values must be non-zero and continuous.")
-    end
+	# Ensure category values are non-zero and continuous.
+	# This allows the index of the output node to equal its category (e.g.,
+	# the first output node is category 1).
+	if (any(y_train .== 0) || any(y_train .> numCats))
+		error("Category values must be non-zero and continuous.")
+	end
 
-    # ================================================
-    #       Select RBF Centers and Parameters
-    # ================================================
+	# ================================================
+	#       Select RBF Centers and Parameters
+	# ================================================
 
-    Centers, betas, numRBFNeurons = computeCentroids(X_train, y_train, centersPerCategory, numCats, verbose)
+	Centers, betas, numRBFNeurons = computeCentroids(X_train, y_train, centersPerCategory, numCats, verbose)
 
-    # ==========================================================
-    #       Compute RBF Activations Over The Training Set
-    # ===========================================================
+	# ==========================================================
+	#       Compute RBF Activations Over The Training Set
+	# ===========================================================
 
-    X_activ = computeRBFActivations(X_train, Centers, betas, numRBFNeurons, verbose)
+	X_activ = computeRBFActivations(X_train, Centers, betas, numRBFNeurons, verbose)
 
-    # =============================================
-    #       Train Output Weights by performing Gradient Descent
-    # =============================================
+	# =============================================
+	#       Train Output Weights by performing Gradient Descent
+	# =============================================
 
-    Theta, nn = computeWeights(X_activ, y_train, numRBFNeurons, numCats, verbose)
+	Theta, nn = computeWeights(X_activ, y_train, sample_weights, numRBFNeurons, numCats, verbose)
 
-    Centers, betas, Theta, nn
+	Centers, betas, Theta, nn
 end

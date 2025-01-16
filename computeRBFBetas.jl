@@ -24,7 +24,7 @@ function computeRBFBetas(X::Array{Float32,2}, centroids::Array{Float32,2}, membe
     sigmas = zeros(numRBFNeurons, 1)
 
     # For each cluster...
-    for i = 1:numRBFNeurons
+    for i ∈ 1:numRBFNeurons
         # Select the next cluster centroid.
         center = centroids[i, :]
         # Select all of the members of this cluster.

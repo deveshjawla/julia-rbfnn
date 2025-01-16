@@ -13,7 +13,7 @@ Returns
 optim_theta - The learned weights of the RBF-NN
 RBFNN - The RBF-NN architecture
 """
-function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, numCats, verbose; lambda=0.0, n_epochs=1000)
+function computeWeights(X::Array{Float32,2}, y::Vector{Int64}, sample_weights, numRBFNeurons, numCats, verbose; lambda=0.0, n_epochs=500)
     if (verbose)
         println("3. Learn output weights.\n")
     end
@@ -22,7 +22,7 @@ function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, n
     y = Flux.onehotbatch(vec(y), 1:numCats)
 
     opt = OptimiserChain(WeightDecay(lambda), AdaBelief())
-	s = ParameterSchedulers.Stateful(CosAnneal(0.1, 1e-6, 100))
+    # s = ParameterSchedulers.Stateful(CosAnneal(0.1, 1e-6, 100))
     opt_state = Flux.setup(opt, nn)
 
     # Train it
@@ -31,20 +31,39 @@ function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, n
     optim_theta = 0
     re = 0
 
-    trnlosses = []
+    train_loader = nothing
+    sample_weights_loader = nothing
+    if size(y, 2) > 1000
+        @info "Using Minibatch Training" batchsize = 1000
+        train_loader = Flux.DataLoader((X, y), batchsize=1000)
+        sample_weights_loader = Flux.DataLoader(sample_weights, batchsize=1000)
+    end
+
+    trnlosses = zeros(n_epochs)
     for e in 1:n_epochs
         local loss = 0.0f0
 
-		# global opt_state, nn
-        Flux.adjust!(opt_state, ParameterSchedulers.next!(s))
-        loss, grad = Flux.withgradient(m -> Flux.Losses.logitcrossentropy(m(X), y), nn)
-        push!(trnlosses, loss)
-        Flux.update!(opt_state, nn, grad[1])
-		
+        # global opt_state, nn
+        # Flux.adjust!(opt_state, ParameterSchedulers.next!(s))
+        # loss, grad = Flux.withgradient(m -> Flux.Losses.logitcrossentropy(m(X), y), nn)
+        if size(y, 2) > 1000
+            for ((x_, y_), sample_weights_) in zip(train_loader, sample_weights_loader)
+                # counter += 1
+                # @info "Minibatch no. $(counter) and Epoch no. $(e)"
+                local l = 0.0
+                l, grad = Flux.withgradient(m -> logitcrossentropyweighted(m(x_), y_, sample_weights_), nn)
+                Flux.update!(opt_state, nn, grad[1])
+                loss += l / length(train_loader)
+            end
+        else
+            loss, grad = Flux.withgradient(m -> logitcrossentropyweighted(m(X), y, sample_weights), nn)
+            trnlosses[e] = loss
+            Flux.update!(opt_state, nn, grad[1])
+        end
         # if mod(e, 2) == 1
         # 	# Report on train and test, only every 2nd epoch_idx:
         # 	@info "After Epoch $e" loss
-		# @warn("After Epoch $e -> $(opt_state.weight.rule)\n $(opt_state.bias.rule)!")
+        # @warn("After Epoch $e -> $(opt_state.weight.rule)\n $(opt_state.bias.rule)!")
         # end
 
         if abs(loss) < abs(least_loss)
@@ -60,8 +79,10 @@ function computeWeights(X::Array{Float32,2}, y::Array{Int64,1}, numRBFNeurons, n
         end
 
     end
-    scatter(trnlosses, width=80, height=30)
-    savefig("./loss_cruve.pdf")
+    # scatter(1:n_epochs, trnlosses, width=80, height=30)
+    # savefig("./$(nn_arch)_loss.pdf")
+    @info "Finished training" last(trnlosses)
+    # optim_params, re = Flux.destructure(nn)
 
     return optim_theta, re
 end
